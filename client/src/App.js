@@ -11,7 +11,8 @@ class App extends Component {
 
   state = {
     search: "",
-    result: []
+    result: [],
+    mySavedBooks: []
   }
 
   handleInputChange = event => {
@@ -42,6 +43,20 @@ class App extends Component {
     })
   }
 
+  delFunc = (event, book) => {
+    event.preventDefault()
+    axios.delete(`http://localhost:3000/api/delete-book/${book._id}`).then(this.getMyBooks())
+  }
+
+
+  componentDidMount() {
+    this.getMyBooks()
+  }
+
+  getMyBooks = () => {
+    axios.get("http://localhost:3000/api/get-books").then(data => this.setState({ mySavedBooks: data.data }))
+  }
+
   
 
   render() {
@@ -61,7 +76,14 @@ class App extends Component {
               />
             </React.Fragment>
           )} />
-          <Route exact path="/saved-books" component={SavedBooks}>
+          <Route path="/saved-books" render={props => (
+            <React.Fragment>
+              <SavedBooks
+                myBooks={this.state.mySavedBooks}
+                delFunc={this.delFunc}
+              />
+            </React.Fragment>
+          )}>
 
           </Route>
         </div>
